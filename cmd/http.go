@@ -5,6 +5,7 @@ import (
 	"kautsarhasby/ewallet-transaction/helpers"
 	"kautsarhasby/ewallet-transaction/internal/api"
 	"kautsarhasby/ewallet-transaction/internal/interfaces"
+	"kautsarhasby/ewallet-transaction/internal/repository"
 	"kautsarhasby/ewallet-transaction/internal/services"
 	"log"
 
@@ -18,7 +19,8 @@ func ServeHTTP() {
 
 	r.GET("/health", d.HealthCheckAPI.HealthCheckHandlerHTTP)
 
-	// walletV1 := r.Group("/wallet/v1")
+	transactionV1 := r.Group("/transaction/v1")
+	transactionV1.POST("/create",d.MiddlewareValidateToken, d.Transaction.CreateTransaction)
 
 	err := r.Run(":" + helpers.GetEnv("PORT", "8080"))
 	if err != nil {
@@ -30,6 +32,7 @@ func ServeHTTP() {
 type Dependency struct {
 	HealthCheckAPI interfaces.IHealthCheckAPI
 	External interfaces.IExternal
+	Transaction interfaces.ITransactionAPI
 }
 
 func dependencyInject() Dependency {
@@ -39,9 +42,14 @@ func dependencyInject() Dependency {
 	}
 
 	external := &external.External{}
-
+	trxRepository := &repository.TransactionRepository{
+		DB: helpers.DB,
+	}
+	trxSvc := &services.TransactionService{TransactionRepository: trxRepository,}
+	trxAPI := &api.TransactionHandler{TransactionService: trxSvc}
 	return Dependency{
 		HealthCheckAPI: healthCheckAPI,
 		External: external,
+		Transaction: trxAPI,
 	}
 }

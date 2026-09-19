@@ -13,7 +13,7 @@ func (d *Dependency) MiddlewareValidateToken(c *gin.Context) {
 	var log =helpers.Logger
 	authHeader := c.Request.Header.Get("Authorization")
     if authHeader == "" {
-        helpers.SendReponseHTTP(c, http.StatusUnauthorized, "unauthorized", nil)
+        helpers.SendResponseHTTP(c, http.StatusUnauthorized, "unauthorized", nil)
         c.Abort()
         return
     }
@@ -21,7 +21,7 @@ func (d *Dependency) MiddlewareValidateToken(c *gin.Context) {
     token := strings.TrimPrefix(authHeader, "Bearer ")
     token = strings.TrimSpace(token)
 	if token == "" {
-		helpers.SendReponseHTTP(c,http.StatusUnauthorized, "unauthorized", nil)
+		helpers.SendResponseHTTP(c,http.StatusUnauthorized, "unauthorized", nil)
 		c.Abort()
 		return
 	}
@@ -29,7 +29,7 @@ func (d *Dependency) MiddlewareValidateToken(c *gin.Context) {
 	tokenData, err := d.External.ValidateToken(c.Request.Context(), token)
 	if err != nil {
 		log.Error(err)
-		helpers.SendReponseHTTP(c,http.StatusUnauthorized, "unauthorized", nil)
+		helpers.SendResponseHTTP(c,http.StatusUnauthorized, "unauthorized", nil)
 		c.Abort()
 		return
 	}

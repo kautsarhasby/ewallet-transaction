@@ -19,5 +19,5 @@ func (api *HealthCheck) HealthCheckHandlerHTTP(c *gin.Context) {
 		return
 	}
 
-	helpers.SendReponseHTTP(c, http.StatusOK, msg, nil)
+	helpers.SendResponseHTTP(c, http.StatusOK, msg, nil)
 }
